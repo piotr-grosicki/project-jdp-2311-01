@@ -13,5 +13,4 @@ public class UserDto {
     private String password;
     private Boolean isBlocked;
     private Long token;
-//    private Long tokenExpiration;
 }
