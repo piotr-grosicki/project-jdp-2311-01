@@ -1,4 +1,4 @@
-package com.kodilla.ecommercee;
+package com.kodilla.ecommercee.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +13,11 @@ public class GenericEntity {
     private String value;
 
     public GenericEntity() {
+    }
+
+    public GenericEntity(Long id, String value) {
+        this.id = id;
+        this.value = value;
     }
 
     public String getValue() {
