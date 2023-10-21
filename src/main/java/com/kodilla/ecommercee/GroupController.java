@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -36,7 +37,7 @@ public class GroupController {
     public ResponseEntity<Void> deleteGroup(@PathVariable Long groupId) {
         groups.remove(groupId.intValue());
         System.out.println("Group with Id " + groupId + " deleted.");
-        System.out.println("List of groups after this change:" + groups.toString());
+        System.out.println("List of groups after this change:" + groups);
         return ResponseEntity.ok().build();
     }
 
@@ -47,8 +48,8 @@ public class GroupController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createGroup(@RequestBody Long groupId, @RequestBody String groupNameToAdd, @RequestBody String groupDescriptionToAdd) {
-        String testResponse = "Adding group with id " + groupId + " named " + groupNameToAdd + " with description: " + groupDescriptionToAdd;
+    public ResponseEntity<String> createGroup(@RequestBody Map<String, Object> requestBody) {
+        String testResponse = "Adding group with id " + requestBody.get("groupId") + " named " + requestBody.get("groupNameToAdd") + " with description: " + requestBody.get("groupDescriptionToAdd");
         return ResponseEntity.ok(testResponse);
     }
 }
