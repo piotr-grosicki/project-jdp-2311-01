@@ -25,4 +25,5 @@ public class Group {
     private Product product;
 
 
+
 }
