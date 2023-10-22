@@ -28,4 +28,9 @@ public class GenericEntity {
 
         this.value = value;
     }
+
+    public GenericEntity(Long id, String value) {
+        this.id = id;
+        this.value = value;
+    }
 }
