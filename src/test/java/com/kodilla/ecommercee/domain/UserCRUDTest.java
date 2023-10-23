@@ -1,6 +1,7 @@
 package com.kodilla.ecommercee.domain;
 
 import com.kodilla.ecommercee.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,14 +15,18 @@ public class UserCRUDTest {
     @Autowired
     private UserRepository userRepository;
 
+    private User user;
+
+    @BeforeEach
+    public void setUp() {
+        user = new User();
+        user.setUsername("testuser");
+        user.setPassword("password");
+    }
+
     @Test
     @DirtiesContext
     public void testCreateUser() {
-        // Given
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
-
         // When
         User savedUser = userRepository.save(user);
         User foundUser = userRepository.findById(savedUser.getId()).orElse(null);
@@ -30,27 +35,20 @@ public class UserCRUDTest {
         assertNotNull(savedUser.getId());
         assertNotNull(foundUser);
         assertEquals(savedUser.getId(), foundUser.getId());
-        assertEquals(savedUser.getUsername(), foundUser.getUsername());
-        assertEquals(savedUser.getPassword(), foundUser.getPassword());
+        assertEquals(user.getUsername(), foundUser.getUsername());
+        assertEquals(user.getPassword(), foundUser.getPassword());
     }
-
-
 
     @Test
     @DirtiesContext
     public void testUpdateUser() {
-        // Given
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
-
         // When
         User savedUser = userRepository.save(user);
         savedUser.setPassword("newpassword");
         userRepository.save(savedUser);
         User updatedUser = userRepository.findById(savedUser.getId()).orElse(null);
 
-        //Then
+        // Then
         assertNotNull(updatedUser);
         assertEquals("newpassword", updatedUser.getPassword());
     }
@@ -58,11 +56,6 @@ public class UserCRUDTest {
     @Test
     @DirtiesContext
     public void testDeleteUser() {
-        // Given
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
-
         // When
         User savedUser = userRepository.save(user);
         userRepository.delete(savedUser);
