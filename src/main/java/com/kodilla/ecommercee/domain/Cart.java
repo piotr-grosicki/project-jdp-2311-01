@@ -18,8 +18,9 @@ public class Cart {
     @Column(name = "ID", unique = true)
     private Long cartId;
 
+    @ManyToOne
     @JoinColumn(name = "USER_ID")
-    private Long userId;
+    private User user;
 
     @Column(name = "CREATION_DATE")
     private LocalDate creationDate;
