@@ -1,6 +1,6 @@
 package com.kodilla.ecommercee.controller;
 
-import com.kodilla.ecommercee.domain.Group;
+import com.kodilla.ecommercee.domain.GroupDto;
 import com.kodilla.ecommercee.domain.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -14,42 +14,42 @@ import java.util.List;
 @RequestMapping("/v1/groups")
 @RequiredArgsConstructor
 public class GroupController {
-    private final List<Group> groups;
+    private final List<GroupDto> groupsDto;
 
     @GetMapping
-    public ResponseEntity<List<Group>> getGroups() {
-        return ResponseEntity.ok(groups);
+    public ResponseEntity<List<GroupDto>> getGroupsDto() {
+        return ResponseEntity.ok(groupsDto);
     }
 
     @GetMapping(value = "{groupId}")
-    public ResponseEntity<Group> getGroup(@PathVariable Long groupId) {
-        return ResponseEntity.ok(groups.get(groupId.intValue()));
+    public ResponseEntity<GroupDto> getGroup(@PathVariable Long groupId) {
+        return ResponseEntity.ok(groupsDto.get(groupId.intValue()));
     }
 
     @DeleteMapping("{groupId}")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long groupId) {
-        groups.remove(groupId.intValue());
+        groupsDto.remove(groupId.intValue());
         System.out.println("Group with Id " + groupId + " deleted.");
-        System.out.println("List of groups after this change:" + groups);
+        System.out.println("List of groups after this change:" + groupsDto);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("{groupId}")
-    public ResponseEntity<Group> updateGroup(@PathVariable Long groupId, @RequestBody Group group) {
-        System.out.println("Group to change:" + groups.get(groupId.intValue()));
-        groups.get(groupId.intValue()).setName(group.getName());
-        groups.get(groupId.intValue()).setDescription(group.getDescription());
-        groups.get(groupId.intValue()).setProduct(new Product());
-        System.out.println("Group after the change:" + groups.get(groupId.intValue()));
-        return ResponseEntity.ok(group);
+    public ResponseEntity<GroupDto> updateGroup(@PathVariable Long groupId, @RequestBody GroupDto groupDto) {
+        System.out.println("Group to change:" + groupsDto.get(groupId.intValue()));
+        groupsDto.get(groupId.intValue()).setName(groupDto.getName());
+        groupsDto.get(groupId.intValue()).setDescription(groupDto.getDescription());
+        groupsDto.get(groupId.intValue()).setProduct(new Product());
+        System.out.println("Group after the change:" + groupsDto.get(groupId.intValue()));
+        return ResponseEntity.ok(groupDto);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Group> createGroup(@RequestBody Group group) {
-        System.out.println("Adding group with id " + group.getGroupId() + " named " + group.getName() + " with description: " + group.getDescription());
-        groups.add(group);
+    public ResponseEntity<GroupDto> createGroup(@RequestBody GroupDto groupDto) {
+        System.out.println("Adding group with id " + groupDto.getGroupId() + " named " + groupDto.getName() + " with description: " + groupDto.getDescription());
+        groupsDto.add(groupDto);
         System.out.println("Group list after the change: ");
-        System.out.println(groups);
-        return ResponseEntity.ok(group);
+        System.out.println(groupsDto);
+        return ResponseEntity.ok(groupDto);
     }
 }
