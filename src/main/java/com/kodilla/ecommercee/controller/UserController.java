@@ -26,9 +26,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
         UserDto user = users.stream()
-                .filter(u -> u.getId().equals(id))
+                .filter(u -> u.getId().equals(userId))
                 .findFirst()
                 .orElse(null);
 
@@ -46,8 +46,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        boolean removed = users.removeIf(u -> u.getId().equals(id));
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        boolean removed = users.removeIf(u -> u.getId().equals(userId));
         if (removed) {
             return ResponseEntity.ok("User deleted successfully");
         } else {
@@ -56,9 +56,9 @@ public class UserController {
     }
 
     @PutMapping(value = "{userId}/block")
-    public ResponseEntity<String> blockUser(@PathVariable Long id) {
+    public ResponseEntity<String> blockUser(@PathVariable Long userId) {
         Optional<UserDto> userDto = users.stream()
-                .filter(u -> u.getId().equals(id))
+                .filter(u -> u.getId().equals(userId))
                 .findFirst();
         return userDto.map(user -> {
             user.setIsBlocked(true);
