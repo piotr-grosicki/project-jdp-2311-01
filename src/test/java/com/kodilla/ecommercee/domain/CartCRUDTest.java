@@ -1,4 +1,4 @@
-package com.kodilla.ecommercee.controller;
+package com.kodilla.ecommercee.domain;
 
 import com.kodilla.ecommercee.domain.Cart;
 import com.kodilla.ecommercee.domain.Product;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-
+import com.kodilla.ecommercee.repository.*
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
