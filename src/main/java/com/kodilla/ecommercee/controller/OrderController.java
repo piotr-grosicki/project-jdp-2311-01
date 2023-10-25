@@ -2,7 +2,9 @@ package com.kodilla.ecommercee.controller;
 
 import com.kodilla.ecommercee.domain.GenericEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,15 +30,17 @@ public class OrderController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void createOrder(@RequestBody GenericEntity genericEntity) {
+    public ResponseEntity<GenericEntity> createOrder(@RequestBody GenericEntity genericEntity) {
+        return ResponseEntity.ok(genericEntity);
     }
 
     @PutMapping(value = "/{id}")
-    public GenericEntity updateOrder(@PathVariable Long id, @RequestBody GenericEntity genericEntity) {
+    public GenericEntity updateOrder(@PathVariable Long id, GenericEntity genericEntity) {
         return new GenericEntity(8L, "Edited test order");
     }
 
     @DeleteMapping(value = "/{id}")
-    public void deleteOrder(@PathVariable Long id) {
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+        return new ResponseEntity<>("Order deleted", HttpStatus.OK);
     }
 }
