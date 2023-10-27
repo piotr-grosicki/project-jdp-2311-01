@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -85,6 +86,14 @@ public class OrderEntityTestSuite {
     @Test
     @Transactional
     @DirtiesContext
+    public void shouldFindAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        assertThat(orders.size()).isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
+    @DirtiesContext
     public void shouldUpdateOrder() {
         Optional<Order> readOrder = orderRepository.findById(1L);
         Order order = readOrder.get();
@@ -136,5 +145,57 @@ public class OrderEntityTestSuite {
 
         // Sprawdzenie, czy zamówienie zostało usunięte
         assertThat(orderRepository.existsById(1L)).isFalse();
+    }
+
+    @Test
+    @Transactional
+    @DirtiesContext
+    public void shouldDeleteOrderAndKeepProductsInCart() {
+        // Odszukanie zamówienia
+        Optional<Order> readOrder = orderRepository.findById(1L);
+        assertThat(readOrder.isPresent()).isTrue();
+
+        // Pobieranie koszyka z zamówieniem
+        Optional<Cart> cart = cartRepository.findById(1L);
+        assertThat(cart.isPresent()).isTrue();
+
+        // Sprawdzenie, czy koszyk zawiera produkt
+        assertThat(cart.get().getProductsList().size()).isEqualTo(1);
+
+        // Usunięcie zamówienia, ale zachowanie produktów w koszyku
+        Order order = readOrder.get();
+        orderRepository.delete(order);
+
+        // Sprawdzenie, czy zamówienie zostało usunięte
+        assertThat(orderRepository.existsById(1L)).isFalse();
+
+        // Ponowne pobranie koszyka
+        Optional<Cart> updatedCart = cartRepository.findById(1L);
+
+        // Sprawdzenie, czy koszyk nadal zawiera produkt
+        assertThat(updatedCart.isPresent()).isTrue();
+        assertThat(updatedCart.get().getProductsList().size()).isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
+    @DirtiesContext
+    public void shouldDeleteOrderButKeepUser() {
+        // Odszukanie zamówienia
+        Optional<Order> readOrder = orderRepository.findById(1L);
+        assertThat(readOrder.isPresent()).isTrue();
+
+        // Pobieranie użytkownika przypisanego do zamówienia
+        User user = readOrder.get().getUser();
+        assertThat(user).isNotNull();
+
+        // Usunięcie zamówienia, ale pozostawienie użytkownika
+        orderRepository.deleteById(1L);
+
+        // Sprawdzenie, czy zamówienie zostało usunięte
+        assertThat(orderRepository.existsById(1L)).isFalse();
+
+        // Sprawdzenie, czy użytkownik nadal istnieje
+        assertThat(userRepository.existsById(user.getId())).isTrue();
     }
 }
