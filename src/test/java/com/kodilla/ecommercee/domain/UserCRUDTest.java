@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
+import javax.transaction.Transactional;
+
 import static org.junit.jupiter.api.Assertions.* ;
 
 
@@ -66,4 +68,65 @@ public class UserCRUDTest {
         assertNull(deletedUser);
 
     }
+    @Test
+    @DirtiesContext
+    @Transactional
+    public void testUserOrderRelation() {
+
+        Order order = new Order();
+        order.setStatus("New");
+
+        user.getOrders().add(order);
+
+        // When
+        User savedUser = userRepository.save(user);
+
+        // Then
+        User foundUser = userRepository.findById(savedUser.getId()).orElse(null);
+        assertNotNull(foundUser);
+        assertEquals(1, foundUser.getOrders().size());
+        assertEquals("New", foundUser.getOrders().get(0).getStatus());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    public void testUserCartRelation() {
+
+        Cart cart = new Cart();
+        cart.setActive(true);
+
+        user.setCart(cart);
+
+        // When
+        User savedUser = userRepository.save(user);
+
+        // Then
+        User foundUser = userRepository.findById(savedUser.getId()).orElse(null);
+        assertNotNull(foundUser);
+        assertNotNull(foundUser.getCart());
+        assertTrue(foundUser.getCart().isActive());
+    }
+    @Test
+    @DirtiesContext
+    public void testFindByUsername() {
+        //When
+        userRepository.save(user);
+        User foundUser = userRepository.findByUsername("testuser");
+
+        //Then
+        assertEquals("testuser", foundUser.getUsername());
+        assertEquals("password", foundUser.getPassword());
+    }
+
+    @Test
+    @DirtiesContext
+    public void testFindByUsernameWhenUserNotExists() {
+        //When
+        User foundUser = userRepository.findByUsername("nonexistentuser");
+
+        //Then
+        assertNull(foundUser);
+    }
+
 }
