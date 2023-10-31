@@ -25,7 +25,7 @@ public class User {
     private String password;
 
     @Column(name = "isBlocked")
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
     @Column(name = "token", unique = true)
     private Long token;
