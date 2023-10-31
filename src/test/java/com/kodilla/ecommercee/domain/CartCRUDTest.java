@@ -2,7 +2,9 @@
 
 package com.kodilla.ecommercee.domain;
 
+import com.kodilla.ecommercee.repository.CartRepository;
 import com.kodilla.ecommercee.repository.ProductRepository;
+import com.kodilla.ecommercee.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
