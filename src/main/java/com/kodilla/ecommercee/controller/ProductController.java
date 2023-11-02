@@ -1,72 +1,54 @@
 package com.kodilla.ecommercee.controller;
 
 import com.kodilla.ecommercee.domain.ProductDto;
-import org.springframework.http.HttpStatus;
+import com.kodilla.ecommercee.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
-    public ProductController() {
+    private final ProductService productService;
 
-        products = new ArrayList<>();
-        products.add(new ProductDto(1, "Product 1", "Description 1", 10.0));
-        products.add(new ProductDto(2, "Product 2", "Description 2", 15.0));
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
-
-    private List<ProductDto> products = new ArrayList<>();
-    private long nextProductId = 1;
 
     @GetMapping
     public List<ProductDto> getAllProducts() {
-
-        return products;
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{productId}")
     public ProductDto getProductById(@PathVariable Long productId) {
-
-        return findProductById(productId);
+        return productService.getProductById(productId);
     }
 
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
-        productDto.setId(nextProductId);
-        products.add(productDto);
-        nextProductId++;
-        return new ResponseEntity<ProductDto>(productDto, HttpStatus.CREATED);
+        ProductDto createdProduct = productService.createProduct(productDto);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{productId}")
+                .buildAndExpand(createdProduct.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(createdProduct);
     }
 
     @PutMapping("/{productId}")
     public ProductDto updateProduct(@PathVariable Long productId, @RequestBody ProductDto updatedProduct) {
-
-        ProductDto existingProduct = findProductById(productId);
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setDescription(updatedProduct.getDescription());
-        existingProduct.setPrice(updatedProduct.getPrice());
-        return existingProduct;
+        return productService.updateProduct(productId, updatedProduct);
     }
 
     @DeleteMapping("/{productId}")
     public void deleteProduct(@PathVariable Long productId) {
-        // Usunięcie produktu o określonym ID (dane przykładowe)
-        ProductDto productToDelete = findProductById(productId);
-        products.remove(productToDelete);
-    }
-
-    private ProductDto findProductById(Long productId) {
-        for (ProductDto product : products) {
-            if (product.getId()==(productId.longValue())) {
-                return product;
-            }
-        }
-        throw new IllegalArgumentException("Product not found");
+        productService.deleteProduct(productId);
     }
 }
-
-
