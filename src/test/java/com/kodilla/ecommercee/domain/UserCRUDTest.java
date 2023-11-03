@@ -125,6 +125,7 @@ public class UserCRUDTest {
         //When
         User foundUser = userRepository.findByUsername("nonexistentuser");
 
+
         //Then
         assertNull(foundUser);
     }
