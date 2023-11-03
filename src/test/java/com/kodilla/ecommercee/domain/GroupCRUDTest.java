@@ -21,6 +21,7 @@ public class GroupCRUDTest {
         group.setName("electronics");
         group.setDescription("some equipment");
 
+
         //When
         groupRepository.save(group);
         String nG = group.getName();
