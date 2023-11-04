@@ -40,7 +40,7 @@ public class OrderEntityTestSuite {
         User user = new User();
         user.setUsername("testUser");
         user.setPassword("testPassword");
-        user.setBlocked(false);
+        user.setIsBlocked(false);
         user.setToken(12345L);
 
         Cart cart = new Cart();
