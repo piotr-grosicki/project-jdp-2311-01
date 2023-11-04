@@ -23,20 +23,13 @@ public class CartCRUDTest {
     private CartRepository cartRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ProductRepository productRepository;
 
-    @BeforeEach
-    public void init() {
-        userRepository.deleteAll();
-        productRepository.deleteAll();
-        cartRepository.deleteAll();
-    }
+
 
     @Test
     @Transactional
+    @DirtiesContext
     public void testCreateCart() {
         // Given
         Cart cart = new Cart();
