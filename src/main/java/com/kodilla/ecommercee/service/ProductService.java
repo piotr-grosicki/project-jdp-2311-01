@@ -45,8 +45,8 @@ public class ProductService {
         }
 
         Product product = productMapper.mapToProduct(productDto);
-        productRepository.save(product);
-        return productDto;
+        Product savedProduct = productRepository.save(product);
+        return productMapper.mapToProductDto(savedProduct);
     }
 
     public ProductDto updateProduct(Long productId, ProductDto updatedProduct) {
