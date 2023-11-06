@@ -26,7 +26,7 @@ public class GroupController {
         return ResponseEntity.ok(groupsDto.get(groupId.intValue()));
     }
 
-    @DeleteMapping("{groupId}")
+    @DeleteMapping("/{groupId}")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long groupId) {
         groupsDto.remove(groupId.intValue());
         System.out.println("Group with Id " + groupId + " deleted.");
@@ -34,12 +34,11 @@ public class GroupController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("{groupId}")
+    @PutMapping("/{groupId}")
     public ResponseEntity<GroupDto> updateGroup(@PathVariable Long groupId, @RequestBody GroupDto groupDto) {
         System.out.println("Group to change:" + groupsDto.get(groupId.intValue()));
         groupsDto.get(groupId.intValue()).setName(groupDto.getName());
         groupsDto.get(groupId.intValue()).setDescription(groupDto.getDescription());
-        groupsDto.get(groupId.intValue()).setProduct(new Product());
         System.out.println("Group after the change:" + groupsDto.get(groupId.intValue()));
         return ResponseEntity.ok(groupDto);
     }
