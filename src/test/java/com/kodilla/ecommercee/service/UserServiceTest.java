@@ -2,6 +2,7 @@ package com.kodilla.ecommercee.service;
 
 import com.kodilla.ecommercee.domain.User;
 import com.kodilla.ecommercee.domain.UserDto;
+import com.kodilla.ecommercee.exception.UnauthorizedException;
 import com.kodilla.ecommercee.exception.UserNotFoundException;
 import com.kodilla.ecommercee.repository.UserRepository;
 import com.kodilla.ecommercee.services.UserService;
@@ -9,13 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-
 import javax.transaction.Transactional;
-
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -26,7 +25,6 @@ public class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
-
     private UserDto newUser;
 
     @BeforeEach
@@ -38,7 +36,7 @@ public class UserServiceTest {
     @Test
     @DirtiesContext
     @Transactional
-    public void testgetAllUsers(){
+    public void testGetAllUsers(){
         //Given
         User user1 = new User();
         user1.setUsername("user1");
@@ -61,23 +59,6 @@ public class UserServiceTest {
     @Test
     @DirtiesContext
     @Transactional
-    public void testgetUserById(){
-        //When
-        UserDto createUser = userService.createUser(newUser);
-
-        //When
-        Long userId = createUser.getId();
-        UserDto foundUser = userService.getUserById(userId);
-
-        //Then
-        assertNotNull(foundUser);
-        assertEquals(newUser.getUsername(),foundUser.getUsername());
-        assertEquals(newUser.getPassword(),foundUser.getPassword());
-
-    }
-    @Test
-    @DirtiesContext
-    @Transactional
     public void testGetUserByIdUserNotFound() {
         // When and Then
         assertThrows(UserNotFoundException.class, () -> userService.getUserById(999L));
@@ -85,21 +66,22 @@ public class UserServiceTest {
     @Test
     @DirtiesContext
     @Transactional
-    public void testCreateUser() {
-        //When
+    public void testCreateAndRetrieveUser() {
+        // Given
+        // When
         UserDto createdUser = userService.createUser(newUser);
-        //Then
+
+        // Then
         assertNotNull(createdUser.getId());
         UserDto foundUser = userService.getUserById(createdUser.getId());
         assertNotNull(foundUser);
         assertEquals(newUser.getUsername(), foundUser.getUsername());
         assertEquals(newUser.getPassword(), foundUser.getPassword());
     }
-
     @Test
     @DirtiesContext
     @Transactional
-    public void testdeleteUser(){
+    public void testDeleteUser(){
         //When
         UserDto createdUser = userService.createUser(newUser);
         //Then
@@ -107,11 +89,10 @@ public class UserServiceTest {
         userService.deleteUser(createdUser.getId());
         assertThrows(UserNotFoundException.class, () -> userService.getUserById(createdUser.getId()));
     }
-
     @Test
     @DirtiesContext
     @Transactional
-    public void testblockUser(){
+    public void testBlockUser(){
         //Given
         UserDto createdUser = userService.createUser(newUser);
         //When
@@ -121,23 +102,70 @@ public class UserServiceTest {
 
         assertNotNull(blockedUser);
         assertTrue(blockedUser.getIsBlocked());
-
     }
     @Test
     @DirtiesContext
     @Transactional
-    public void testCreateActiveSession() {
+    public void testCreateActiveSessionAndTokenAssignment() {
         //Given
         userService.createUser(newUser);
-        //When
-        UserDto loginData = new UserDto();
-        loginData.setUsername("testuser");
-        loginData.setPassword("password");
-        String result = userService.createActiveSession(loginData);
-        //Then
+
+        // When
+        UserDto user = userService.getUserByUsername("testuser");
+        String result = userService.createActiveSession(user);
+
+        // Then
         assertNotNull(result);
         assertTrue(result.startsWith("You are logged in. Your token is: "));
+        assertTrue(result.contains("You are logged in. Your token is: "));
     }
+    @Test
+    @DirtiesContext
+    @Transactional
+    public void testInvalidLoginPassword() {
+        // Given
+        userService.createUser(newUser);
 
+        // When
+        UserDto loginData = new UserDto();
+        loginData.setUsername("testuser");
+        loginData.setPassword("invalid_password");
 
+        // Then
+        assertThrows(UnauthorizedException.class, () -> userService.createActiveSession(loginData));
+    }
+    @Test
+    @DirtiesContext
+    @Transactional
+    public void testInvalidLoginUserNotFound() {
+        // When
+        UserDto loginData = new UserDto();
+        loginData.setUsername("non_existent_user");
+        loginData.setPassword("password");
+
+        // Then
+        assertThrows(UnauthorizedException.class, () -> userService.createActiveSession(loginData));
+    }
+    @Test
+    @DirtiesContext
+    @Transactional
+    public void testCreateUserWithDuplicateUsername() {
+        // Given
+        userService.createUser(newUser);
+
+        // When
+        UserDto duplicateUser = new UserDto();
+        duplicateUser.setUsername("testuser");
+        duplicateUser.setPassword("another_password");
+
+        // Then
+        assertThrows(DataIntegrityViolationException.class, () -> userService.createUser(duplicateUser));
+    }
+    @Test
+    @DirtiesContext
+    @Transactional
+    public void testDeleteNonExistentUser() {
+        // Then
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(999L));
+    }
 }

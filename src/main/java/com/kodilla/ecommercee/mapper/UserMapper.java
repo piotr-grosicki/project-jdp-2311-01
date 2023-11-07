@@ -17,7 +17,7 @@ public class UserMapper {
         return userDto;
     }
 
-    public static User mapToEntityUser(UserDto userDto) {
+    public User mapToEntityUser(UserDto userDto) {
         User user = new User();
         user.setId(userDto.getId());
         user.setUsername(userDto.getUsername());
@@ -27,3 +27,4 @@ public class UserMapper {
         return user;
     }
 }
+

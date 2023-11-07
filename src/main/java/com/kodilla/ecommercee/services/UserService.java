@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    public final UserRepository userRepository;
+    public final UserMapper userMapper;
     private final Map<Long, String> userTokens = new HashMap<>();
 
     @Autowired
@@ -96,6 +96,16 @@ public class UserService {
             }
         }, sessionDuration);
     }
+    public UserDto getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return userMapper.mapToDto(user);
+        } else {
+            throw new UserNotFoundException("Użytkownik o nazwie " + username + " nie istnieje.");
+        }
+    }
+
+
 }
 
 
