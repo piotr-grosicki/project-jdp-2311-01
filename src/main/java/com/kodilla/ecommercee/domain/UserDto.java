@@ -3,6 +3,8 @@ package com.kodilla.ecommercee.domain;
 
 import lombok.Data;
 
+import java.time.LocalTime;
+
 
 @Data
 public class UserDto {
@@ -11,4 +13,5 @@ public class UserDto {
     private String password;
     private Boolean isBlocked;
     private String token;
+    private LocalTime loginTime;
 }

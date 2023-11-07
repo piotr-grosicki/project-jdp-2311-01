@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,4 +55,7 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     private Cart cart;
+
+    @Column(nullable = true, name = "LOGIN_TIME")
+    private LocalTime loginTime;
 }

@@ -9,6 +9,8 @@ import com.kodilla.ecommercee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,20 +69,27 @@ public class UserService {
         }
     }
 
+    @Transactional
     public String createActiveSession(UserDto loginData) {
-        Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(loginData.getUsername()));
+        User user = userRepository.findByUsername(loginData.getUsername());
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (user.getPassword().equals(loginData.getPassword())) {
+        if (user != null && user.getPassword().equals(loginData.getPassword())) {
+            LocalTime now = LocalTime.now();
+            LocalTime lastLoginTime = user.getLoginTime();
+
+            if (lastLoginTime == null || now.minusHours(1).isAfter(lastLoginTime)) {
                 String token = generateRandomToken();
                 user.setToken(token);
+                user.setLoginTime(now);
                 userRepository.save(user);
                 scheduleSessionExpiration(user.getId());
                 return "You are logged in. Your token is: " + token + " It will expire in 1 hour.";
+            } else {
+                throw new UnauthorizedException("Login too soon. Please wait before trying again.");
             }
+        } else {
+            throw new UnauthorizedException("Invalid username or password");
         }
-        throw new UnauthorizedException("Invalid username or password");
     }
 
     private String generateRandomToken() {
@@ -97,6 +106,7 @@ public class UserService {
             }
         }, sessionDuration);
     }
+
     public UserDto getUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user != null) {
@@ -105,8 +115,4 @@ public class UserService {
             throw new UserNotFoundException("Użytkownik o nazwie " + username + " nie istnieje.");
         }
     }
-
-
 }
-
-

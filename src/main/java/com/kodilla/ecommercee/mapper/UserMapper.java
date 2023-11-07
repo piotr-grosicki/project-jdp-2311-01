@@ -14,6 +14,7 @@ public class UserMapper {
         userDto.setPassword(user.getPassword());
         userDto.setIsBlocked(user.getIsBlocked());
         userDto.setToken(user.getToken());
+        userDto.setLoginTime(user.getLoginTime());
         return userDto;
     }
 
@@ -24,6 +25,7 @@ public class UserMapper {
         user.setPassword(userDto.getPassword());
         user.setIsBlocked(userDto.getIsBlocked());
         user.setToken(userDto.getToken());
+        user.setLoginTime(userDto.getLoginTime());
         return user;
     }
 }
