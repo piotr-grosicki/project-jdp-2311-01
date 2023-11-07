@@ -1,11 +1,17 @@
 package com.kodilla.ecommercee.domain;
 
 import com.kodilla.ecommercee.repository.GroupRepository;
+import com.kodilla.ecommercee.repository.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class GroupCRUDTest {
@@ -13,16 +19,25 @@ public class GroupCRUDTest {
     @Autowired
     private GroupRepository groupRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
+    private Group group;
+
+    @BeforeEach
+    public void setUp() {
+        group = new Group();
+        group.setGroupId(1L);
+        group.setName("electronics");
+        group.setDescription("some equipment");
+        groupRepository.save(group);
+    }
+
     @Test
     @DirtiesContext
     public void testCreateGroup() {
-        //Given
-        Group group = new Group();
-        group.setName("electronics");
-        group.setDescription("some equipment");
 
         //When
-        groupRepository.save(group);
         String nG = group.getName();
         Group group1 = groupRepository.findById(group.getGroupId()).orElse(null);
 
@@ -34,10 +49,6 @@ public class GroupCRUDTest {
     @Test
     @DirtiesContext
     public void testFindGroupById() {
-        //Given
-        Group group = new Group();
-        group.setName("electronics");
-        group.setDescription("some equipment");
 
         //When
         groupRepository.save(group);
@@ -50,11 +61,26 @@ public class GroupCRUDTest {
 
     @Test
     @DirtiesContext
-    public void testUpdateGroup() {
+    public void testFindAllGroups() {
+
         //Given
-        Group group = new Group();
-        group.setName("electronics");
-        group.setDescription("some equipment");
+        Group group2 = new Group();
+        group2.setGroupId(2L);
+        group2.setName("electric stuff");
+        group2.setDescription("jigsaw");
+
+        //When
+        groupRepository.save(group);
+        groupRepository.save(group2);
+        List<Group> groupList = groupRepository.findAll();
+
+        //Then
+        assertThat(groupList.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DirtiesContext
+    public void testUpdateGroup() {
 
         //When
         Group group1 = groupRepository.save(group);
@@ -72,10 +98,6 @@ public class GroupCRUDTest {
     @Test
     @DirtiesContext
     public void testDeleteGroup() {
-        //Given
-        Group group = new Group();
-        group.setName("electronics");
-        group.setDescription("some equipment");
 
         //When
         Group groupAdd = groupRepository.save(group);
@@ -86,4 +108,43 @@ public class GroupCRUDTest {
         assertNull(groupDelete);
     }
 
+    @Test
+    @DirtiesContext
+    public void testGroupProductRelation() {
+
+        //Given
+        Product product = new Product();
+        product.setProductId(100L);
+        product.setNameProduct("Circular Saw");
+        Product product2 = new Product();
+        product2.setProductId(101L);
+        product2.setNameProduct("Electric screwdriver");
+        productRepository.save(product);
+        productRepository.save(product2);
+
+        //When
+        group.getProductList().add(product);
+        group.getProductList().add(product2);
+        groupRepository.save(group);
+        product.setGroup(group);
+        product2.setGroup(group);
+        Group productGroup = product.getGroup();
+
+        //Then
+        assertEquals(2, group.getProductList().size());
+        assertEquals(group.getGroupId(), productGroup.getGroupId());
+    }
+
+    @Test
+    @DirtiesContext
+    public void testExistByName() {
+
+        //When
+        boolean isExisting = groupRepository.existsByName(group.getName());
+        boolean isExisting2 = groupRepository.existsByName("stuff");
+
+        //Then
+        assertTrue(isExisting);
+        assertFalse(isExisting2);
+    }
 }
