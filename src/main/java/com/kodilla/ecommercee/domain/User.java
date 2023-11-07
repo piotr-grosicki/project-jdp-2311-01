@@ -28,7 +28,7 @@ public class User {
     private Boolean isBlocked;
 
     @Column(name = "token", unique = true)
-    private Long token;
+    private String token;
 
     // Relacje do koszyka Cart
     @OneToMany(

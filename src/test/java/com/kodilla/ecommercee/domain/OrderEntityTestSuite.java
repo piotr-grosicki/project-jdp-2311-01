@@ -41,7 +41,7 @@ public class OrderEntityTestSuite {
         user.setUsername("testUser");
         user.setPassword("testPassword");
         user.setIsBlocked(false);
-        user.setToken(12345L);
+        user.setToken("12345L");
 
         Cart cart = new Cart();
         cart.setCreationDate(LocalDate.of(2023, 3, 20));

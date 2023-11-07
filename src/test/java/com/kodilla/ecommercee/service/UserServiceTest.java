@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+
 @SpringBootTest
 @ActiveProfiles("test")
 public class UserServiceTest {
@@ -67,7 +68,7 @@ public class UserServiceTest {
     @DirtiesContext
     @Transactional
     public void testCreateAndRetrieveUser() {
-        // Given
+
         // When
         UserDto createdUser = userService.createUser(newUser);
 
@@ -107,17 +108,27 @@ public class UserServiceTest {
     @DirtiesContext
     @Transactional
     public void testCreateActiveSessionAndTokenAssignment() {
-        //Given
-        userService.createUser(newUser);
+        // Given
+        User existingUser = new User();
+        existingUser.setUsername("testuser");
+        existingUser.setPassword("password");
+        existingUser.setToken("valid_token");
+        userRepository.save(existingUser);
 
         // When
-        UserDto user = userService.getUserByUsername("testuser");
-        String result = userService.createActiveSession(user);
+        UserDto loginData = new UserDto();
+        loginData.setUsername("testuser");
+        loginData.setPassword("password");
+        String result = userService.createActiveSession(loginData);
 
         // Then
         assertNotNull(result);
         assertTrue(result.startsWith("You are logged in. Your token is: "));
-        assertTrue(result.contains("You are logged in. Your token is: "));
+
+        User updatedUser = userRepository.findById(existingUser.getId()).orElse(null);
+        assertNotNull(updatedUser);
+        assertNotNull(updatedUser.getToken());
+        assertEquals(result, "You are logged in. Your token is: " + updatedUser.getToken() + " It will expire in 1 hour.");
     }
     @Test
     @DirtiesContext

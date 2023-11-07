@@ -74,7 +74,8 @@ public class UserService {
             User user = userOptional.get();
             if (user.getPassword().equals(loginData.getPassword())) {
                 String token = generateRandomToken();
-                userTokens.put(user.getId(), token);
+                user.setToken(token);
+                userRepository.save(user);
                 scheduleSessionExpiration(user.getId());
                 return "You are logged in. Your token is: " + token + " It will expire in 1 hour.";
             }

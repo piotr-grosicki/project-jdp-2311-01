@@ -10,5 +10,5 @@ public class UserDto {
     private String username;
     private String password;
     private Boolean isBlocked;
-    private Long token;
+    private String token;
 }
