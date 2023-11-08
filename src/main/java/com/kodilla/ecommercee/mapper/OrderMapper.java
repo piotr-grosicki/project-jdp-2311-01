@@ -4,7 +4,10 @@ import com.kodilla.ecommercee.domain.Order;
 import com.kodilla.ecommercee.domain.OrderDto;
 import com.kodilla.ecommercee.domain.Product;
 import com.kodilla.ecommercee.domain.User;
+import com.kodilla.ecommercee.service.ProductService;
+import com.kodilla.ecommercee.service.UserService;
 import org.springframework.stereotype.Service;
+import com.kodilla.ecommercee.exception.UserNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,13 +15,8 @@ import java.util.stream.Collectors;
 @Service
 public class OrderMapper {
 
-
-
     private UserService userService;
-    private ProductMapper productMapper;
     private ProductService productService;
-
-
 
     public Order mapToOrder(final OrderDto orderDto) throws UserNotFoundException {
         Order order = new Order();
