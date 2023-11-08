@@ -1,11 +1,8 @@
 package com.kodilla.ecommercee.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class ProductAlreadyExistsException extends ResponseStatusException {
-
-        public ProductAlreadyExistsException() {
-            super(HttpStatus.CONFLICT, "Product already exists");
-        }
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ProductAlreadyExistsException extends Exception {
 }

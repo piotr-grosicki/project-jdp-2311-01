@@ -1,11 +1,8 @@
 package com.kodilla.ecommercee.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class ProductNotFoundException extends ResponseStatusException {
-
-    public ProductNotFoundException() {
-        super(HttpStatus.NOT_FOUND, "Product not found");
-    }
+@ResponseStatus(HttpStatus.CONFLICT)
+public class ProductNotFoundException extends RuntimeException {
 }

@@ -29,7 +29,7 @@ public class ProductService {
         return productMapper.mapToProductDtoList(products);
     }
 
-    public ProductDto getProductById(Long productId) {
+    public ProductDto getProductById(Long productId) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
@@ -39,7 +39,7 @@ public class ProductService {
         }
     }
 
-    public ProductDto createProduct(ProductDto productDto) {
+    public ProductDto createProduct(ProductDto productDto) throws ProductAlreadyExistsException {
         if (productDto.getId() != 0) {
             throw new ProductAlreadyExistsException();
         }
@@ -49,7 +49,7 @@ public class ProductService {
         return productMapper.mapToProductDto(savedProduct);
     }
 
-    public ProductDto updateProduct(Long productId, ProductDto updatedProduct) {
+    public ProductDto updateProduct(Long productId, ProductDto updatedProduct) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isPresent()) {
             Product existingProduct = productOptional.get();
@@ -63,7 +63,7 @@ public class ProductService {
         }
     }
 
-    public void deleteProduct(Long productId) {
+    public void deleteProduct(Long productId) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isPresent()) {
             productRepository.deleteById(productId);
