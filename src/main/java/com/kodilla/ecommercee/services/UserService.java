@@ -7,6 +7,7 @@ import com.kodilla.ecommercee.exception.UserNotFoundException;
 import com.kodilla.ecommercee.mapper.UserMapper;
 import com.kodilla.ecommercee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -45,6 +46,9 @@ public class UserService {
     }
 
     public UserDto createUser(UserDto newUser) {
+        if (userRepository.findByUsername(newUser.getUsername()) != null) {
+            throw new DataIntegrityViolationException("User named " + newUser.getUsername() + " already exists.");
+        }
         User user = userMapper.mapToEntityUser(newUser);
         userRepository.save(user);
         return userMapper.mapToDto(user);
@@ -105,14 +109,5 @@ public class UserService {
                 System.out.println("Session expired for user " + id);
             }
         }, sessionDuration);
-    }
-
-    public UserDto getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user != null) {
-            return userMapper.mapToDto(user);
-        } else {
-            throw new UserNotFoundException("Użytkownik o nazwie " + username + " nie istnieje.");
-        }
     }
 }
