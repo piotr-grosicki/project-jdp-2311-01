@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import javax.transaction.Transactional;
@@ -26,13 +28,10 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserMapper userMapper;
-
     private UserDto newUser;
 
     @BeforeEach
@@ -128,21 +127,23 @@ public class UserServiceTest {
     @Transactional
     @DirtiesContext
     void createActiveSession_ValidLoginData_ShouldCreateSession() {
-        UserDto createUser = userService.createUser(newUser);
-        User usertest = new User();
-        usertest.setUsername("testuser");
-        usertest.setPassword("password");
-        usertest.setLoginTime(null);
+        // Given
+        UserDto existingUser = aUser();
+        existingUser.setUsername("testuser");
+        existingUser.setPassword("password");
 
-        String result = userService.createActiveSession(newUser);
+        // When
+        String result = String.valueOf(userService.createActiveSession(existingUser));
 
+        // Then
         assertNotNull(result);
-        assertTrue(result.startsWith("You are logged in. Your token is: "));
+        if (result.startsWith("You are logged in. Your token is: ")) {
 
-        User user = userRepository.findByUsername(newUser.getUsername());
-        assertNotNull(user);
-        assertNotNull(user.getToken());
-        assertNotNull(user.getLoginTime());
+            User user = userRepository.findByUsername(existingUser.getUsername());
+            assertNotNull(user);
+            assertNotNull(user.getToken());
+            assertNotNull(user.getLoginTime());
+        }
     }
 
     @Test
@@ -158,7 +159,9 @@ public class UserServiceTest {
         loginData.setPassword("invalid_password");
 
         // Then
-        assertThrows(UnauthorizedException.class, () -> userService.createActiveSession(loginData));
+        ResponseEntity<String> response = userService.createActiveSession(loginData);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid username or password", response.getBody());
     }
 
     @Test
@@ -171,7 +174,9 @@ public class UserServiceTest {
         loginData.setPassword("password");
 
         // Then
-        assertThrows(UnauthorizedException.class, () -> userService.createActiveSession(loginData));
+        ResponseEntity<String> response = userService.createActiveSession(loginData);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid username or password", response.getBody());
     }
 
     @Test
@@ -200,18 +205,25 @@ public class UserServiceTest {
     @Transactional
     @DirtiesContext
     public void createActiveSession_InvalidLoginData_ShouldThrowUnauthorizedException() {
-        UserDto loginData = new UserDto();
+        // Given
+        UserDto loginData = aUser();
         loginData.setUsername("testUser");
         loginData.setPassword("testPassword");
 
-        assertThrows(UnauthorizedException.class, () -> userService.createActiveSession(loginData));
+        // When
+        ResponseEntity<String> response = userService.createActiveSession(loginData);
+
+        // Then
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid username or password", response.getBody());
     }
 
     @Test
     @Transactional
     @DirtiesContext
     public void createActiveSession_LoginTooSoon_ShouldThrowUnauthorizedException() {
-        UserDto loginData = new UserDto();
+        // Given
+        UserDto loginData = aUser();
         loginData.setUsername("testUser");
         loginData.setPassword("testPassword");
 
@@ -219,9 +231,20 @@ public class UserServiceTest {
         user.setUsername("testUser");
         user.setPassword("testPassword");
         user.setLoginTime(LocalTime.now().minusMinutes(30));
-
         userRepository.save(user);
 
-        assertThrows(UnauthorizedException.class, () -> userService.createActiveSession(loginData));
+        // When
+        ResponseEntity<String> response = userService.createActiveSession(loginData);
+
+        // Then
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Login too soon. Please wait before trying again.", response.getBody());
+    }
+
+    private UserDto aUser() {
+        UserDto user = new UserDto();
+        user.setUsername("username");
+        user.setPassword("password");
+        return user;
     }
 }

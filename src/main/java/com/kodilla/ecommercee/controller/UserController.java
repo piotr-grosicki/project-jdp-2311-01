@@ -29,10 +29,10 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
-        UserDto user = userService.getUserById(userId);
-        if (user != null) {
+        try {
+            UserDto user = userService.getUserById(userId);
             return ResponseEntity.ok(user);
-        } else {
+        } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -65,7 +65,7 @@ public class UserController {
 
     @PostMapping("/session")
     public ResponseEntity<String> createActiveSession(@RequestBody UserDto loginData) {
-        String result = userService.createActiveSession(loginData);
+        String result = String.valueOf(userService.createActiveSession(loginData));
         return ResponseEntity.ok(result);
     }
 }

@@ -8,8 +8,9 @@ import com.kodilla.ecommercee.mapper.UserMapper;
 import com.kodilla.ecommercee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import com.kodilla.ecommercee.exception.UnauthorizedException.*;
 import javax.transaction.Transactional;
 import java.time.LocalTime;
 import java.util.*;
@@ -74,7 +75,7 @@ public class UserService {
     }
 
     @Transactional
-    public String createActiveSession(UserDto loginData) {
+    public ResponseEntity<String> createActiveSession(UserDto loginData) {
         User user = userRepository.findByUsername(loginData.getUsername());
 
         if (user != null && user.getPassword().equals(loginData.getPassword())) {
@@ -87,12 +88,12 @@ public class UserService {
                 user.setLoginTime(now);
                 userRepository.save(user);
                 scheduleSessionExpiration(user.getId());
-                return "You are logged in. Your token is: " + token + " It will expire in 1 hour.";
+                return ResponseEntity.ok("You are logged in. Your token is: " + token + " It will expire in 1 hour.");
             } else {
-                throw new UnauthorizedException("Login too soon. Please wait before trying again.");
+                return new UnauthorizedException("Login too soon. Please wait before trying again.").toResponseEntity();
             }
         } else {
-            throw new UnauthorizedException("Invalid username or password");
+            return new UnauthorizedException("Invalid username or password").toResponseEntity();
         }
     }
 
