@@ -1,46 +1,47 @@
 package com.kodilla.ecommercee.controller;
 
-import com.kodilla.ecommercee.domain.GenericEntity;
+import com.kodilla.ecommercee.domain.OrderDto;
+import com.kodilla.ecommercee.exception.OrderNotFoundException;
+import com.kodilla.ecommercee.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("orders")
+@RequestMapping("/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
+    private final OrderService orderService;
+
     @GetMapping
-    public List<GenericEntity>  getOrders() {
-        List<GenericEntity> orders = new ArrayList<>();
-        orders.add(new GenericEntity(1L, "Order 1"));
-        orders.add(new GenericEntity(2L, "Order 2"));
-        orders.add(new GenericEntity(3L, "Order 3"));
-        return orders;
+    public List<OrderDto>  getAllOrders() {
+        return orderService.getAllOrders();
     }
 
-    @GetMapping(value = "/{id}")
-    public GenericEntity getOrder(@PathVariable Long id) {
-        return new GenericEntity(1L, "Test order");
+    @GetMapping(value = "/{orderId}")
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable Long orderId) throws OrderNotFoundException {
+        return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GenericEntity> createOrder(@RequestBody GenericEntity genericEntity) {
-        return ResponseEntity.ok(genericEntity);
+    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
+        OrderDto createOrder = orderService.createOrder(orderDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createOrder);
     }
 
-    @PutMapping(value = "/{id}")
-    public GenericEntity updateOrder(@PathVariable Long id, GenericEntity genericEntity) {
-        return new GenericEntity(8L, "Edited test order");
+    @PutMapping(value = "/{orderId}")
+    public ResponseEntity<OrderDto> updateOrder(@PathVariable OrderDto orderDto) throws OrderNotFoundException {
+        return ResponseEntity.ok(orderService.updateOrder(orderDto));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+    @DeleteMapping(value = "/{orderId}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId) throws OrderNotFoundException {
+        orderService.deleteOrder(orderId);
         return new ResponseEntity<>("Order deleted", HttpStatus.OK);
     }
 }
