@@ -28,7 +28,7 @@ public class Cart {
     @Column(name = "ACTIVE")
     private boolean active;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "PRODUCT_LIST",
             joinColumns = @JoinColumn(name = "CART_ID"),
