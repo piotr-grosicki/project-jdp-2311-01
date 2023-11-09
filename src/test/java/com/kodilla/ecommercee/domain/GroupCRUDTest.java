@@ -30,7 +30,7 @@ public class GroupCRUDTest {
         group.setGroupId(1L);
         group.setName("electronics");
         group.setDescription("some equipment");
-        groupRepository.save(group);
+
     }
 
     @Test
@@ -38,6 +38,7 @@ public class GroupCRUDTest {
     public void testCreateGroup() {
 
         //When
+        groupRepository.save(group);
         String nG = group.getName();
         Group group1 = groupRepository.findById(group.getGroupId()).orElse(null);
 
@@ -57,6 +58,9 @@ public class GroupCRUDTest {
         //Then
         assertNotNull(foundGroup);
         assertEquals(group.getGroupId(),foundGroup.getGroupId());
+        assertEquals(group.getGroupId(), foundGroup.getGroupId());
+        assertEquals(group.getName(), foundGroup.getName());
+        assertEquals(group.getDescription(), foundGroup.getDescription());
     }
 
     @Test
@@ -133,6 +137,16 @@ public class GroupCRUDTest {
         //Then
         assertEquals(2, group.getProductList().size());
         assertEquals(group.getGroupId(), productGroup.getGroupId());
+        assertEquals(product.getNameProduct(), productGroup.getProductList().get(0).getNameProduct());
+        assertEquals(product.getProductId(), productGroup.getProductList().get(0).getProductId());
+        assertEquals(product.getDescriptionProduct(), productGroup.getProductList().get(0).getDescriptionProduct());
+        assertEquals(product.getPrice(), productGroup.getProductList().get(0).getPrice());
+        assertEquals(product.getGroup(), productGroup.getProductList().get(0).getGroup());
+        assertEquals(product2.getNameProduct(), productGroup.getProductList().get(1).getNameProduct());
+        assertEquals(product2.getProductId(), productGroup.getProductList().get(1).getProductId());
+        assertEquals(product.getDescriptionProduct(), productGroup.getProductList().get(1).getDescriptionProduct());
+        assertEquals(product.getPrice(), productGroup.getProductList().get(1).getPrice());
+        assertEquals(product.getGroup(), productGroup.getProductList().get(1).getGroup());
     }
 
     @Test

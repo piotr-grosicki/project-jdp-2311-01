@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupMapper {
 
-    private final ProductMapper productMapper;
+//    private final ProductMapper productMapper;
 
     public Group mapToGroup(final GroupDto groupDto) {
         return new Group(
