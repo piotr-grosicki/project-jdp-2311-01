@@ -117,7 +117,7 @@ public class CartCRUDTest {
     @Test
     @Transactional
     @DirtiesContext
-    public void testCartProductRelation() {
+    public void testCartProductRelations() {
         // Given
         Cart cart = new Cart();
         cart.setCreationDate(LocalDate.now());
@@ -131,10 +131,9 @@ public class CartCRUDTest {
         product2.setNameProduct("Product 2");
         productRepository.save(product2);
 
-        List<Product> products = new ArrayList<>();
-        products.add(product1);
-        products.add(product2);
-        cart.setProductsList(products);
+        // Add products to the cart
+        cart.getProductsList().add(product1);
+        cart.getProductsList().add(product2);
 
         // When
         cartRepository.save(cart);
@@ -150,38 +149,7 @@ public class CartCRUDTest {
         }
     }
 
-    @Test
-    @Transactional
-    @DirtiesContext
-    public void testProductCartRelation() {
-        // Given
-        Cart cart = new Cart();
-        cart.setCreationDate(LocalDate.now());
-        cart.setActive(true);
-        cart = cartRepository.save(cart);
 
-        Product product1 = new Product();
-        product1.setNameProduct("Product 1");
-        productRepository.save(product1);
-
-        Product product2 = new Product();
-        product2.setNameProduct("Product 2");
-        productRepository.save(product2);
-
-        // When
-        cart.getProductsList().add(product1);
-        cart.getProductsList().add(product2);
-        cartRepository.save(cart);
-
-        // Then
-        Product savedProduct1 = productRepository.findById(product1.getProductId()).orElse(null);
-        Product savedProduct2 = productRepository.findById(product2.getProductId()).orElse(null);
-
-        assertNotNull(savedProduct1);
-        assertNotNull(savedProduct2);
-
-        assertTrue(cartRepository.existsById(cart.getCartId()));
-    }
 
     @Test
     @Transactional
@@ -201,10 +169,12 @@ public class CartCRUDTest {
         // When
         userRepository.save(user);
         cartRepository.save(cart);
+        User savedUser = userRepository.findById(user.getId()).orElse(null);
+        Cart savedCart = cartRepository.findById(cart.getCartId()).orElse(null);
 
         // Then
-        User savedUser = userRepository.findById(user.getId()).orElse(null);
         assertEquals(1, savedUser.getCartList().size());
+        assertEquals("username", savedCart.getUser().getUsername());
     }
 
     @Test
