@@ -9,5 +9,5 @@ public class GroupDto {
         private Long groupId;
         private String name;
         private String description;
-        private List<Products> productdDtoList;
+        private List<Product> productdDtoList;
 }
