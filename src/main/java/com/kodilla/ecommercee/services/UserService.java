@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.kodilla.ecommercee.exception.UnauthorizedException.*;
 import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +23,6 @@ public class UserService {
 
     public final UserRepository userRepository;
     public final UserMapper userMapper;
-    private final Map<Long, String> userTokens = new HashMap<>();
 
     @Autowired
     public UserService(UserRepository userRepository, UserMapper userMapper) {
@@ -101,14 +102,44 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    private void scheduleSessionExpiration(Long id) {
-        long sessionDuration = 3600 * 1000; // 1 hour in milliseconds
+    private ResponseEntity<String> scheduleSessionExpiration(Long id) {
+        long sessionDurationMillis = 3600 * 1000; // 1 godzina w milisekundach
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user != null) {
+            LocalDateTime loginTime = LocalDateTime.from(user.getLoginTime());
+            LocalDateTime currentTime = LocalDateTime.now();
+            Duration sessionDuration = Duration.between(loginTime, currentTime);
+
+            if (sessionDuration.toMillis() >= sessionDurationMillis) {
+                user.setToken(null);
+                userRepository.save(user);
+                System.out.println("Session expired for user " + id);
+                return ResponseEntity.ok("Session expired for user " + id);
+            }
+        }
+
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                userTokens.remove(id);
-                System.out.println("Session expired for user " + id);
+                handleSessionExpiration(id);
             }
-        }, sessionDuration);
+        }, sessionDurationMillis);
+
+        return ResponseEntity.ok("Session scheduled for user " + id);
     }
+
+    public ResponseEntity<String> handleSessionExpiration(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user != null) {
+            user.setToken(null);
+            userRepository.save(user);
+            System.out.println("Session expired for user " + id);
+            return ResponseEntity.ok("Session expired for user " + id);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
 }

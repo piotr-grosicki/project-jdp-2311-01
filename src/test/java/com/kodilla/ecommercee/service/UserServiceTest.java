@@ -128,7 +128,7 @@ public class UserServiceTest {
     @DirtiesContext
     void createActiveSession_ValidLoginData_ShouldCreateSession() {
         // Given
-        UserDto existingUser = aUser();
+        UserDto existingUser = newUser;
         existingUser.setUsername("testuser");
         existingUser.setPassword("password");
 
@@ -206,7 +206,7 @@ public class UserServiceTest {
     @DirtiesContext
     public void createActiveSession_InvalidLoginData_ShouldThrowUnauthorizedException() {
         // Given
-        UserDto loginData = aUser();
+        UserDto loginData = newUser;
         loginData.setUsername("testUser");
         loginData.setPassword("testPassword");
 
@@ -223,7 +223,7 @@ public class UserServiceTest {
     @DirtiesContext
     public void createActiveSession_LoginTooSoon_ShouldThrowUnauthorizedException() {
         // Given
-        UserDto loginData = aUser();
+        UserDto loginData = newUser;
         loginData.setUsername("testUser");
         loginData.setPassword("testPassword");
 
@@ -240,11 +240,18 @@ public class UserServiceTest {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Login too soon. Please wait before trying again.", response.getBody());
     }
+    @Test
+    public void testHandleSessionExpiration_UserNotFound() {
+        // Given
+        long nonExistentUserId = 999L;
 
-    private UserDto aUser() {
-        UserDto user = new UserDto();
-        user.setUsername("username");
-        user.setPassword("password");
-        return user;
+        // When
+        ResponseEntity<String> response = userService.handleSessionExpiration(nonExistentUserId);
+
+        // Then
+        assertEquals(404, response.getStatusCodeValue());
+
     }
+
+
 }
