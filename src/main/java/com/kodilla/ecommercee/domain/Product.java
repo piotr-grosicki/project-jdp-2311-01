@@ -5,28 +5,36 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "PRODUCTS")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
+    @Column(name = "PRODUCT_ID")
     private Long productId;
 
-    @Column(name = "name")
+    @Column(name = "NAME")
     private String nameProduct;
 
-    @Column(name = "description")
+    @Column(name = "DESCRIPTION")
     private String descriptionProduct;
 
-    @Column(name = "price")
-    private double price;
+    @Column(name = "PRICE")
+    private Double price;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "GROUP_ID")
     private Group group;
+
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "productsList")
+    private List<Cart> cartList = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "productList")
+    private List<Order> orderList;
 }

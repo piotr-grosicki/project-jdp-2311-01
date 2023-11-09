@@ -1,7 +1,6 @@
 package com.kodilla.ecommercee.controller;
 
 import com.kodilla.ecommercee.domain.GroupDto;
-import com.kodilla.ecommercee.domain.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +38,6 @@ public class GroupController {
         System.out.println("Group to change:" + groupsDto.get(groupId.intValue()));
         groupsDto.get(groupId.intValue()).setName(groupDto.getName());
         groupsDto.get(groupId.intValue()).setDescription(groupDto.getDescription());
-        groupsDto.get(groupId.intValue()).setProduct(new Product());
         System.out.println("Group after the change:" + groupsDto.get(groupId.intValue()));
         return ResponseEntity.ok(groupDto);
     }
