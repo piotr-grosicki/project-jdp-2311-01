@@ -15,24 +15,27 @@ public class Cart {
     @Id
     @NotNull
     @GeneratedValue
-    @Column(name = "ID", unique = true)
+    @Column(name = "CART_ID", unique = true)
     private Long cartId;
-
-    @ManyToOne
-    @JoinColumn(name = "USER_ID")
-    private User user;
 
     @Column(name = "CREATION_DATE")
     private LocalDate creationDate;
 
     @Column(name = "ACTIVE")
-    private boolean active;
+    private Boolean active;
 
-    @ManyToMany
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "PRODUCT_LIST",
-            joinColumns = @JoinColumn(name = "CART_ID"),
-            inverseJoinColumns = @JoinColumn(name = "PRODUCT_ID")
+            name = "JOIN_CART_PRODUCT",
+            joinColumns = {@JoinColumn(name = "CART_ID", referencedColumnName = "CART_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "PRODUCT_ID", referencedColumnName = "PRODUCT_ID")}
     )
     private List<Product> productsList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "cart", cascade = CascadeType.ALL)
+    private Order order;
 }

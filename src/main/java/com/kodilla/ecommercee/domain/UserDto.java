@@ -13,5 +13,5 @@ public class UserDto {
     private String password;
     private Boolean isBlocked;
     private String token;
-    private LocalTime loginTime;
+    private LocalTime tokenExpirationTime;
 }

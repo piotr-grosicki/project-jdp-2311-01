@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.kodilla.ecommercee.exception.UnauthorizedException.*;
 import javax.transaction.Transactional;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,17 +76,19 @@ public class UserService {
     public ResponseEntity<String> createActiveSession(UserDto loginData) {
         User user = userRepository.findByUsername(loginData.getUsername());
 
-        if (user != null && user.getPassword().equals(loginData.getPassword())) {
+        if (user != null && loginData.getPassword() != null && user.getPassword().equals(loginData.getPassword())) {
             LocalTime now = LocalTime.now();
-            LocalTime lastLoginTime = user.getLoginTime();
+            LocalTime tokenExpirationTime = now.plusHours(1);
 
-            if (lastLoginTime == null || now.minusHours(1).isAfter(lastLoginTime)) {
+            if (user.getTokenExpirationTime() == null ||
+                    now.minusHours(1).isAfter(user.getTokenExpirationTime())) {
                 String token = generateRandomToken();
                 user.setToken(token);
-                user.setLoginTime(now);
+                user.setTokenExpirationTime(tokenExpirationTime);
                 userRepository.save(user);
-                scheduleSessionExpiration(user.getId());
-                return ResponseEntity.ok("You are logged in. Your token is: " + token + " It will expire in 1 hour.");
+
+                return ResponseEntity.ok("You are logged in. Your token is: " + token +
+                        ". It will expire in 1 hour.");
             } else {
                 return new UnauthorizedException("Login too soon. Please wait before trying again.").toResponseEntity();
             }
@@ -101,45 +100,4 @@ public class UserService {
     private String generateRandomToken() {
         return UUID.randomUUID().toString();
     }
-
-    private ResponseEntity<String> scheduleSessionExpiration(Long id) {
-        long sessionDurationMillis = 3600 * 1000; // 1 godzina w milisekundach
-        User user = userRepository.findById(id).orElse(null);
-
-        if (user != null) {
-            LocalDateTime loginTime = LocalDateTime.from(user.getLoginTime());
-            LocalDateTime currentTime = LocalDateTime.now();
-            Duration sessionDuration = Duration.between(loginTime, currentTime);
-
-            if (sessionDuration.toMillis() >= sessionDurationMillis) {
-                user.setToken(null);
-                userRepository.save(user);
-                System.out.println("Session expired for user " + id);
-                return ResponseEntity.ok("Session expired for user " + id);
-            }
-        }
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                handleSessionExpiration(id);
-            }
-        }, sessionDurationMillis);
-
-        return ResponseEntity.ok("Session scheduled for user " + id);
-    }
-
-    public ResponseEntity<String> handleSessionExpiration(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-
-        if (user != null) {
-            user.setToken(null);
-            userRepository.save(user);
-            System.out.println("Session expired for user " + id);
-            return ResponseEntity.ok("Session expired for user " + id);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
 }

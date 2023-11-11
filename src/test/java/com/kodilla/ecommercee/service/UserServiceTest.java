@@ -39,7 +39,7 @@ public class UserServiceTest {
         newUser = new UserDto();
         newUser.setUsername("testuser");
         newUser.setPassword("password");
-        newUser.setLoginTime(null);
+        newUser.setTokenExpirationTime(null);
     }
 
     @Test
@@ -50,13 +50,13 @@ public class UserServiceTest {
         User user1 = new User();
         user1.setUsername("user1");
         user1.setPassword("password1");
-        user1.setLoginTime(LocalTime.from(LocalDateTime.now()));
+        user1.setTokenExpirationTime(LocalTime.from(LocalDateTime.now()));
         userRepository.save(user1);
 
         User user2 = new User();
         user2.setUsername("user2");
         user2.setPassword("password2");
-        user2.setLoginTime(LocalTime.from(LocalDateTime.now()));
+        user2.setTokenExpirationTime(LocalTime.from(LocalDateTime.now()));
         userRepository.save(user2);
 
         // When
@@ -142,7 +142,7 @@ public class UserServiceTest {
             User user = userRepository.findByUsername(existingUser.getUsername());
             assertNotNull(user);
             assertNotNull(user.getToken());
-            assertNotNull(user.getLoginTime());
+            assertNotNull(user.getTokenExpirationTime());
         }
     }
 
@@ -230,7 +230,7 @@ public class UserServiceTest {
         User user = new User();
         user.setUsername("testUser");
         user.setPassword("testPassword");
-        user.setLoginTime(LocalTime.now().minusMinutes(30));
+        user.setTokenExpirationTime(LocalTime.now().minusMinutes(30));
         userRepository.save(user);
 
         // When
@@ -240,18 +240,5 @@ public class UserServiceTest {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Login too soon. Please wait before trying again.", response.getBody());
     }
-    @Test
-    public void testHandleSessionExpiration_UserNotFound() {
-        // Given
-        long nonExistentUserId = 999L;
-
-        // When
-        ResponseEntity<String> response = userService.handleSessionExpiration(nonExistentUserId);
-
-        // Then
-        assertEquals(404, response.getStatusCodeValue());
-
-    }
-
 
 }
