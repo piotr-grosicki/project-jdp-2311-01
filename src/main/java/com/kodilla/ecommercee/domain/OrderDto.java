@@ -18,4 +18,5 @@ public class OrderDto {
     private Date orderDate;
     private String status;
     private List<Long> productId;
+    private Long cartId;
 }

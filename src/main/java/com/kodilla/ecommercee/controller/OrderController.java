@@ -35,7 +35,8 @@ public class OrderController {
     }
 
     @PutMapping(value = "/{orderId}")
-    public ResponseEntity<OrderDto> updateOrder(@PathVariable OrderDto orderDto) throws OrderNotFoundException {
+    public ResponseEntity<OrderDto> updateOrder(@PathVariable Long orderId, @RequestBody OrderDto orderDto) throws OrderNotFoundException {
+        orderDto.setOrderId(orderId);
         return ResponseEntity.ok(orderService.updateOrder(orderDto));
     }
 
