@@ -3,8 +3,6 @@ package com.kodilla.ecommercee.controller;
 import com.kodilla.ecommercee.domain.CartDto;
 import com.kodilla.ecommercee.domain.GenericEntity;
 import com.kodilla.ecommercee.domain.ProductDto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +24,8 @@ public class CartController {
         carts = new ArrayList<>();
 
         // For simplicity, let's assume ProductDto has a constructor taking all fields
-        ProductDto product1 = new ProductDto(1, "Product A", "Description A", 10.0);
-        ProductDto product2 = new ProductDto(2, "Product B", "Description B", 20.0);
+        ProductDto product1 = new ProductDto(1L, "Product A", "Description A", 10.0, 5L);
+        ProductDto product2 = new ProductDto(2L, "Product B", "Description B", 20.0, 5L);
         List<ProductDto> productsForCart1 = new ArrayList<>(Arrays.asList(product1, product2));
 
         CartDto cart1 = new CartDto(1L, 101L, productsForCart1, true, LocalDateTime.now());

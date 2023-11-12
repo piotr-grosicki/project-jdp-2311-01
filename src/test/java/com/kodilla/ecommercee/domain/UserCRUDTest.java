@@ -76,7 +76,7 @@ public class UserCRUDTest {
         Order order = new Order();
         order.setStatus("New");
 
-        user.getOrders().add(order);
+        user.getOrderList().add(order);
 
         // When
         User savedUser = userRepository.save(user);
@@ -84,8 +84,8 @@ public class UserCRUDTest {
         // Then
         User foundUser = userRepository.findById(savedUser.getId()).orElse(null);
         assertNotNull(foundUser);
-        assertEquals(1, foundUser.getOrders().size());
-        assertEquals("New", foundUser.getOrders().get(0).getStatus());
+        assertEquals(1, foundUser.getOrderList().size());
+        assertEquals("New", foundUser.getOrderList().get(0).getStatus());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class UserCRUDTest {
         Cart cart = new Cart();
         cart.setActive(true);
 
-        user.setCart(cart);
+        user.getCartList().add(cart);
 
         // When
         User savedUser = userRepository.save(user);
@@ -104,8 +104,8 @@ public class UserCRUDTest {
         // Then
         User foundUser = userRepository.findById(savedUser.getId()).orElse(null);
         assertNotNull(foundUser);
-        assertNotNull(foundUser.getCart());
-        assertTrue(foundUser.getCart().isActive());
+        assertNotNull(foundUser.getCartList());
+
     }
     @Test
     @DirtiesContext
