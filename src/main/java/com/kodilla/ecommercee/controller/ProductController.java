@@ -19,9 +19,9 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+        products = new ArrayList<>();
+        products.add(new ProductDto(1L, "Product 1", "Description 1", 10.0, 5L));
+        products.add(new ProductDto(2L, "Product 2", "Description 2", 15.0, 5L));
     }
 
     @GetMapping
