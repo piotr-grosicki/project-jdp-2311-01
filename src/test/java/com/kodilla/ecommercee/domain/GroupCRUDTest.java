@@ -95,7 +95,7 @@ public class GroupCRUDTest {
 
         //Then
         assertNotNull(groupUpdate);
-        assertEquals("thing",groupUpdate.getName());
+        assertEquals("thing", groupUpdate.getName());
         assertEquals("new stuff", groupUpdate.getDescription());
     }
 
@@ -117,36 +117,32 @@ public class GroupCRUDTest {
     public void testGroupProductRelation() {
 
         //Given
-        Product product = new Product();
-        product.setProductId(100L);
-        product.setNameProduct("Circular Saw");
-        Product product2 = new Product();
-        product2.setProductId(101L);
-        product2.setNameProduct("Electric screwdriver");
+        groupRepository.save(group);
+        Product product = new Product(1L, "cos", "coscos", 12.0, group, null, null);
+        Product product2 = new Product(2L, "cos2", "coscos2", 212.0, group, null, null);
+
         productRepository.save(product);
         productRepository.save(product2);
 
         //When
-        group.getProductList().add(product);
-        group.getProductList().add(product2);
-        groupRepository.save(group);
-        product.setGroup(group);
-        product2.setGroup(group);
-        Group productGroup = product.getGroup();
-
+        Group productGroup = groupRepository.findById(group.getGroupId()).orElse(null);
+        Product groupProduct = productRepository.findById(product2.getProductId()).orElse(null);
         //Then
-        assertEquals(2, group.getProductList().size());
+        assertNotNull(productGroup);
+        assertNotNull(groupProduct);
+        assertEquals(group.getGroupId(), groupProduct.getGroup().getGroupId());
+        assertEquals(2, productGroup.getProductList().size());
         assertEquals(group.getGroupId(), productGroup.getGroupId());
         assertEquals(product.getNameProduct(), productGroup.getProductList().get(0).getNameProduct());
         assertEquals(product.getProductId(), productGroup.getProductList().get(0).getProductId());
         assertEquals(product.getDescriptionProduct(), productGroup.getProductList().get(0).getDescriptionProduct());
         assertEquals(product.getPrice(), productGroup.getProductList().get(0).getPrice());
-        assertEquals(product.getGroup(), productGroup.getProductList().get(0).getGroup());
         assertEquals(product2.getNameProduct(), productGroup.getProductList().get(1).getNameProduct());
         assertEquals(product2.getProductId(), productGroup.getProductList().get(1).getProductId());
-        assertEquals(product.getDescriptionProduct(), productGroup.getProductList().get(1).getDescriptionProduct());
-        assertEquals(product.getPrice(), productGroup.getProductList().get(1).getPrice());
-        assertEquals(product.getGroup(), productGroup.getProductList().get(1).getGroup());
+        assertEquals(product2.getDescriptionProduct(), productGroup.getProductList().get(1).getDescriptionProduct());
+        assertEquals(product2.getPrice(), productGroup.getProductList().get(1).getPrice());
+        assertEquals(group.getName(), groupProduct.getGroup().getName());
+        assertEquals(group.getDescription(), groupProduct.getGroup().getDescription());
     }
 
     @Test
@@ -154,6 +150,7 @@ public class GroupCRUDTest {
     public void testExistByName() {
 
         //When
+        groupRepository.save(group);
         boolean isExisting = groupRepository.existsByName(group.getName());
         boolean isExisting2 = groupRepository.existsByName("stuff");
 
