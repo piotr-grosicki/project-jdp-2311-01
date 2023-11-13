@@ -1,4 +1,4 @@
-package com.kodilla.ecommercee.exceptions;
+package com.kodilla.ecommercee.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,5 +12,10 @@ public class GlobalHttpErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(GroupNotFoundException.class)
     public ResponseEntity<Object> handleGroupNotFoundException (GroupNotFoundException exception) {
         return new ResponseEntity<>("Group with given ID doesn't exist.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Object> handleOrderNotFoundException (OrderNotFoundException exception) {
+        return new ResponseEntity<>("Order with given ID doesn't exist.", HttpStatus.NOT_FOUND);
     }
 }
