@@ -14,6 +14,11 @@ public class GlobalHttpErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>("Group with given ID doesn't exist.", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(GroupAlreadyExistsException.class)
+    public ResponseEntity<Object> handleGroupAlreadyExistsException (GroupAlreadyExistsException exception) {
+        return new ResponseEntity<>("The Group with given name already exists.", HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<Object> handleProductNotFoundException(Exception exception) {
         return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
