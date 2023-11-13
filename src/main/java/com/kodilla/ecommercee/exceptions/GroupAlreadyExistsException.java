@@ -1,4 +1,4 @@
-package com.kodilla.ecommercee.exception;
+package com.kodilla.ecommercee.exceptions;
 
 public class GroupAlreadyExistsException extends  Throwable{
 }
