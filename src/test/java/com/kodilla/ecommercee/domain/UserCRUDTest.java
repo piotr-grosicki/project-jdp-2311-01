@@ -94,7 +94,6 @@ public class UserCRUDTest {
     public void testUserCartRelation() {
 
         Cart cart = new Cart();
-        cart.setActive(true);
 
         user.getCartList().add(cart);
 

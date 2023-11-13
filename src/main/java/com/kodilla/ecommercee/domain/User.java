@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +27,10 @@ public class User {
     private String password;
 
     @Column(name = "ISBLOCKED")
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
     @Column(name = "TOKEN", unique = true)
-    private Long token;
+    private String token;
 
     @OneToMany(
             targetEntity = Cart.class,
@@ -45,4 +47,6 @@ public class User {
             fetch = FetchType.LAZY
     )
     private List<Order> orderList = new ArrayList<>();
+
+    private LocalTime tokenExpirationTime;
 }
