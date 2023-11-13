@@ -2,8 +2,8 @@ package com.kodilla.ecommercee.service;
 
 import com.kodilla.ecommercee.domain.Product;
 import com.kodilla.ecommercee.domain.ProductDto;
-import com.kodilla.ecommercee.exception.ProductAlreadyExistsException;
-import com.kodilla.ecommercee.exception.ProductNotFoundException;
+import com.kodilla.ecommercee.exceptions.ProductAlreadyExistsException;
+import com.kodilla.ecommercee.exceptions.ProductNotFoundException;
 import com.kodilla.ecommercee.mapper.ProductMapper;
 import com.kodilla.ecommercee.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,14 @@ public class ProductService {
 
     public List<ProductDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
-        return productMapper.mapToProductDtoList(products);
+        return ProductMapper.mapToProductDtoList(products);
     }
 
     public ProductDto getProductById(Long productId) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
-            return productMapper.mapToProductDto(product);
+            return ProductMapper.mapToProductDto(product);
         } else {
             throw new ProductNotFoundException();
         }
@@ -44,9 +44,9 @@ public class ProductService {
             throw new ProductAlreadyExistsException();
         }
 
-        Product product = productMapper.mapToProduct(productDto);
+        Product product = ProductMapper.mapToProduct(productDto);
         Product savedProduct = productRepository.save(product);
-        return productMapper.mapToProductDto(savedProduct);
+        return ProductMapper.mapToProductDto(savedProduct);
     }
 
     public ProductDto updateProduct(Long productId, ProductDto updatedProduct) throws ProductNotFoundException {
@@ -57,7 +57,7 @@ public class ProductService {
             existingProduct.setDescriptionProduct(updatedProduct.getDescription());
             existingProduct.setPrice(updatedProduct.getPrice());
             Product updatedProductEntity = productRepository.save(existingProduct);
-            return productMapper.mapToProductDto(updatedProductEntity);
+            return ProductMapper.mapToProductDto(updatedProductEntity);
         } else {
             throw new ProductNotFoundException();
         }

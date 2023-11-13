@@ -1,77 +1,70 @@
 package com.kodilla.ecommercee.controller;
 
 import com.kodilla.ecommercee.domain.ProductDto;
-import com.kodilla.ecommercee.exception.ProductAlreadyExistsException;
-import com.kodilla.ecommercee.exception.ProductNotFoundException;
-import com.kodilla.ecommercee.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
-    private final ProductService productService;
+    public ProductController() {
 
         products = new ArrayList<>();
         products.add(new ProductDto(1L, "Product 1", "Description 1", 10.0, 5L));
         products.add(new ProductDto(2L, "Product 2", "Description 2", 15.0, 5L));
     }
 
+    private List<ProductDto> products = new ArrayList<>();
+    private long nextProductId = 1;
+
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<ProductDto> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+    public List<ProductDto> getAllProducts() {
+
+        return products;
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDto> getProductById(@PathVariable Long productId) {
-        try {
-            ProductDto product = productService.getProductById(productId);
-            return ResponseEntity.ok(product);
-        } catch (ProductNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ProductDto getProductById(@PathVariable Long productId) {
+
+        return findProductById(productId);
     }
 
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
-        try {
-            ProductDto createdProduct = productService.createProduct(productDto);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{productId}")
-                    .buildAndExpand(createdProduct.getId())
-                    .toUri();
-            return ResponseEntity.created(location).body(createdProduct);
-        } catch (ProductAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
+        productDto.setId(nextProductId);
+        products.add(productDto);
+        nextProductId++;
+        return new ResponseEntity<ProductDto>(productDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long productId, @RequestBody ProductDto updatedProduct) {
-        try {
-            ProductDto updated = productService.updateProduct(productId, updatedProduct);
-            return ResponseEntity.ok(updated);
-        } catch (ProductNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ProductDto updateProduct(@PathVariable Long productId, @RequestBody ProductDto updatedProduct) {
+
+        ProductDto existingProduct = findProductById(productId);
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setDescription(updatedProduct.getDescription());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        return existingProduct;
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
-        try {
-            productService.deleteProduct(productId);
-            return ResponseEntity.noContent().build();
-        } catch (ProductNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    public void deleteProduct(@PathVariable Long productId) {
+        // Usunięcie produktu o określonym ID (dane przykładowe)
+        ProductDto productToDelete = findProductById(productId);
+        products.remove(productToDelete);
+    }
+
+    private ProductDto findProductById(Long productId) {
+        for (ProductDto product : products) {
+            if (product.getId()==(productId.longValue())) {
+                return product;
+            }
         }
+        throw new IllegalArgumentException("Product not found");
     }
 }
