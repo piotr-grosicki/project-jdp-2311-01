@@ -1,53 +1,48 @@
 package com.kodilla.ecommercee.controller;
 
 import com.kodilla.ecommercee.domain.GroupDto;
+import com.kodilla.ecommercee.exception.GroupAlreadyExistsException;
+import com.kodilla.ecommercee.exception.GroupNotFoundException;
+import com.kodilla.ecommercee.service.GroupService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/v1/groups")
 @RequiredArgsConstructor
 public class GroupController {
-    private final List<GroupDto> groupsDto;
+
+    private final GroupService groupService;
 
     @GetMapping
-    public ResponseEntity<List<GroupDto>> getGroupsDto() {
-        return ResponseEntity.ok(groupsDto);
+    public List<GroupDto> getAllGroups() {
+        return groupService.getAllGroups();
     }
 
-    @GetMapping(value = "{groupId}")
-    public ResponseEntity<GroupDto> getGroup(@PathVariable Long groupId) {
-        return ResponseEntity.ok(groupsDto.get(groupId.intValue()));
-    }
-
-    @DeleteMapping("/{groupId}")
-    public ResponseEntity<Void> deleteGroup(@PathVariable Long groupId) {
-        groupsDto.remove(groupId.intValue());
-        System.out.println("Group with Id " + groupId + " deleted.");
-        System.out.println("List of groups after this change:" + groupsDto);
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping("/{groupId}")
-    public ResponseEntity<GroupDto> updateGroup(@PathVariable Long groupId, @RequestBody GroupDto groupDto) {
-        System.out.println("Group to change:" + groupsDto.get(groupId.intValue()));
-        groupsDto.get(groupId.intValue()).setName(groupDto.getName());
-        groupsDto.get(groupId.intValue()).setDescription(groupDto.getDescription());
-        System.out.println("Group after the change:" + groupsDto.get(groupId.intValue()));
-        return ResponseEntity.ok(groupDto);
+    @GetMapping("{groupId}")
+    public ResponseEntity<GroupDto> getGroupById(@PathVariable Long groupId) throws GroupNotFoundException {
+        return ResponseEntity.ok(groupService.getGroupById(groupId));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GroupDto> createGroup(@RequestBody GroupDto groupDto) {
-        System.out.println("Adding group with id " + groupDto.getGroupId() + " named " + groupDto.getName() + " with description: " + groupDto.getDescription());
-        groupsDto.add(groupDto);
-        System.out.println("Group list after the change: ");
-        System.out.println(groupsDto);
-        return ResponseEntity.ok(groupDto);
+    public ResponseEntity<String> createGroup(@RequestBody GroupDto groupDto) throws GroupAlreadyExistsException {
+        groupService.createGroup(groupDto);
+        return new ResponseEntity<>("The Group has been created", HttpStatus.CREATED);
+    }
+
+    @PutMapping
+    public ResponseEntity<GroupDto> updateGroup(@RequestBody GroupDto groupDto) throws GroupNotFoundException {
+        return ResponseEntity.ok(groupService.updateGroup(groupDto));
+    }
+
+    @DeleteMapping("{groupId}")
+    public ResponseEntity<String> deleteGroup(@PathVariable Long groupId) throws GroupNotFoundException {
+        groupService.deleteGroup(groupId);
+        return new ResponseEntity<>("The Group has been deleted", HttpStatus.OK);
     }
 }

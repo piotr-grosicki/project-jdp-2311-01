@@ -1,18 +1,22 @@
 package com.kodilla.ecommercee.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
 @Table(name = "PRODUCT_GROUPS")
 public class Group {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "GROUP_ID")
     private Long groupId;
 
