@@ -8,7 +8,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class GroupDto {
-
         private Long groupId;
         private String name;
         private String description;
